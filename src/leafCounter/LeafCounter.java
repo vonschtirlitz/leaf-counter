@@ -38,36 +38,33 @@ public class LeafCounter {
 		System.out.println(posts);
 		
 		//Count data
+		//CYKA BLYAT, russian dolls need fixing here, otherwise works good
 		List<CountryData> countries = new ArrayList<CountryData>();
+		List<String> postids = new ArrayList<String>();
+		
+		//verify ids
 		for(int i=0;i<posts.posts.size();i++){
-			boolean finished=false;
-			if(countries.size()==0){
-				countries.add(new CountryData(posts.getCountry(i)));
-				countries.get(0).addId(posts.getId(i));
-				finished=true;
+			boolean idmatches=false;
+			for(int j=0;j<postids.size();j++){
+				if(posts.getId(i).equals(postids.get(j))){
+					idmatches=true;
+				}
 			}
-			else if(!finished){
+			if(idmatches==false){
+				postids.add(posts.getId(i));
+				//check if country exists
+				boolean countryexists = false;
 				for(int j=0;j<countries.size();j++){
-					if(posts.getCountry(i).equals(countries.get(j).getName())){
-						for(int k=0;k<countries.get(j).registeredIds.size();k++){
-							if(posts.getId(i).equals(countries.get(j).registeredIds.get(k))){
-								finished=true;
-								}
-							
-							else if(!finished)
-							{
-								countries.get(j).addOne();
-								countries.get(j).addId(posts.getId(i));
-								finished=true;
-							}
+					if(!countryexists){
+						if(posts.getCountry(i).equals(countries.get(j).getName()))
+						{
+							countries.get(j).addOne();
+							countryexists = true;
 						}
 					}
-					if((!(posts.getCountry(i).equals(countries.get(j).getName())))&&(!finished)){
-						countries.add(new CountryData(posts.getCountry(i)));
-						countries.get(j).addId(posts.getId(i));
-						finished=true;
-					}
-					
+				}
+				if(!countryexists){
+					countries.add(new CountryData(posts.getCountry(i)));
 				}
 			}
 		}
@@ -77,6 +74,20 @@ public class LeafCounter {
 			System.out.println(countries.get(i).getName()+" "+countries.get(i).getNum());
 		}
 		System.out.println("done");
+		
+		int leafId = 0;
+		int totalPosts = 0;
+		for(int i=0;i<countries.size();i++){
+			if(countries.get(i).getName().equals("CA")){
+				leafId=i;
+			}
+			totalPosts+=countries.get(i).getNum();
+		}
+		double leafPercentage = (double)countries.get(leafId).getNum()/(double)totalPosts;
+
+		//System.out.println(leafPercentage);
+		System.out.print("Leaf clutter in this thread is at "+(leafPercentage*100)+"%");
+		
 		
 		//TODO actually process and count the leafs, check user ID for unique leafs
 		

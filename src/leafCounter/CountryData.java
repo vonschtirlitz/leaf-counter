@@ -6,7 +6,7 @@ import java.util.List;
 public class CountryData {
 	String countryName;
 	int numInThread;
-	List<String> registeredIds= new ArrayList<String>();
+	//List<String> registeredIds= new ArrayList<String>();
 	
 	public CountryData(String name){
 		countryName = name;
@@ -25,12 +25,12 @@ public class CountryData {
 		numInThread++;
 	}
 	
-	public void addId(String id){
+	/*public void addId(String id){
 		registeredIds.add(id);
-	}
+	}*/
 	
-	public List<String> returnIds(){
+	/*public List<String> returnIds(){
 		return registeredIds;
-	}
+	}*/
 
 }
