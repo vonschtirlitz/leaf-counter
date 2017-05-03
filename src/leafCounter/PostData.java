@@ -9,6 +9,15 @@ public class PostData {
 	//public void setPostData(Posts newValue){
 	//	posts = newValue;
 	//}
+	public String getCountry(int index)
+	{
+		return posts.get(index).getCountry();
+	}
+	
+	public String getId(int index)
+	{
+		return posts.get(index).getId();
+	}
 	
 	public String toString(){
 		return posts.toString();

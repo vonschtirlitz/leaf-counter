@@ -37,6 +37,47 @@ public class LeafCounter {
 		PostData posts = gson.fromJson(jsonUrl,PostData.class);
 		System.out.println(posts);
 		
+		//Count data
+		List<CountryData> countries = new ArrayList<CountryData>();
+		for(int i=0;i<posts.posts.size();i++){
+			boolean finished=false;
+			if(countries.size()==0){
+				countries.add(new CountryData(posts.getCountry(i)));
+				countries.get(0).addId(posts.getId(i));
+				finished=true;
+			}
+			else if(!finished){
+				for(int j=0;j<countries.size();j++){
+					if(posts.getCountry(i).equals(countries.get(j).getName())){
+						for(int k=0;k<countries.get(j).registeredIds.size();k++){
+							if(posts.getId(i).equals(countries.get(j).registeredIds.get(k))){
+								finished=true;
+								}
+							
+							else if(!finished)
+							{
+								countries.get(j).addOne();
+								countries.get(j).addId(posts.getId(i));
+								finished=true;
+							}
+						}
+					}
+					if((!(posts.getCountry(i).equals(countries.get(j).getName())))&&(!finished)){
+						countries.add(new CountryData(posts.getCountry(i)));
+						countries.get(j).addId(posts.getId(i));
+						finished=true;
+					}
+					
+				}
+			}
+		}
+		
+		//Print Data
+		for(int i=0;i<countries.size();i++){
+			System.out.println(countries.get(i).getName()+" "+countries.get(i).getNum());
+		}
+		System.out.println("done");
+		
 		//TODO actually process and count the leafs, check user ID for unique leafs
 		
 	}
