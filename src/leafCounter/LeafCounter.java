@@ -10,31 +10,34 @@ public class LeafCounter {
 	
 	public static void main(String[] args) throws Exception
 	{
+		//Init shit
 		String threadUrl = "";
 		String board = "";
 		String threadId = "";
 		String jsonUrl = "";
 		
+		//Get URL from user, dont fuck it up since I havent made exceptions
 		Scanner input = new Scanner(System.in);
-		
 		System.out.print("Paste thread url: ");
 		threadUrl = input.next();
 		
+		//Trim url to get board and thread id. Board is kind of redundant
+		//since this is supposed to be used with /pol/ but I guess it could work with /int/
 		int cutoffPoint = threadUrl.indexOf("thread");
 		board = threadUrl.substring(cutoffPoint-4,cutoffPoint-1);
 		threadId = threadUrl.substring(cutoffPoint+7, threadUrl.length());
-		//System.out.println(board);
-		//System.out.println(threadId);
 		
+		//Convert standard 4chan url to a.4cdn url
 		jsonUrl = "http://a.4cdn.org/"+board+"/thread/"+threadId+".json";
 		jsonUrl = readUrl(jsonUrl);
 		System.out.println(jsonUrl);
 		
+		//Convert json to java data
 		Gson gson = new Gson();
-		//ArrayList<Post> posts = new ArrayList<Post>(0);
-		Post posts = gson.fromJson(jsonUrl,Post.class);
-		//posts.add(gson.fromJson(jsonUrl,Post.class));
-		//System.out.println(posts.getCountry());
+		PostData posts = gson.fromJson(jsonUrl,PostData.class);
+		System.out.println(posts);
+		
+		//TODO actually process and count the leafs, check user ID for unique leafs
 		
 	}
 	
