@@ -26,9 +26,11 @@ public class LeafCounter {
 		//since this is supposed to be used with /pol/ but I guess it could work with /int/
 		int cutoffPoint = threadUrl.indexOf("thread");
 		board = threadUrl.substring(cutoffPoint-4,cutoffPoint-1);
+		
 		//MANUAL OVERRIDE
 		//board="pol";
 		board="bant";
+		
 		if(threadUrl.charAt(threadUrl.length()-1)=='/'){
 			threadId = threadUrl.substring(cutoffPoint+7, threadUrl.length()-1);
 		}
