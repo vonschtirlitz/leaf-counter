@@ -1,9 +1,9 @@
 package leafCounter;
 
 import java.util.*;
+import java.text.*;
 import java.io.*;
-import java.net.URL;
-
+import java.net.*;
 import com.google.gson.*;
 
 public class LeafCounter {
@@ -15,6 +15,7 @@ public class LeafCounter {
 		String board = "";
 		String threadId = "";
 		String jsonUrl = "";
+		boolean isArchived = false;
 		
 		//Get URL from user, dont fuck it up since I havent made exceptions
 		Scanner input = new Scanner(System.in);
@@ -25,7 +26,15 @@ public class LeafCounter {
 		//since this is supposed to be used with /pol/ but I guess it could work with /int/
 		int cutoffPoint = threadUrl.indexOf("thread");
 		board = threadUrl.substring(cutoffPoint-4,cutoffPoint-1);
-		threadId = threadUrl.substring(cutoffPoint+7, threadUrl.length());
+		//MANUAL OVERRIDE
+		//board="pol";
+		board="bant";
+		if(threadUrl.charAt(threadUrl.length()-1)=='/'){
+			threadId = threadUrl.substring(cutoffPoint+7, threadUrl.length()-1);
+		}
+		else{
+			threadId = threadUrl.substring(cutoffPoint+7, threadUrl.length());
+		}
 		
 		//Convert standard 4chan url to a.4cdn url
 		jsonUrl = "http://a.4cdn.org/"+board+"/thread/"+threadId+".json";
@@ -38,19 +47,44 @@ public class LeafCounter {
 		System.out.println(posts);
 		
 		//Count data
-		//CYKA BLYAT, russian dolls need fixing here, otherwise works good
 		List<CountryData> countries = new ArrayList<CountryData>();
 		List<String> postids = new ArrayList<String>();
-		
-		//verify ids
-		for(int i=0;i<posts.posts.size();i++){
-			boolean idmatches=false;
-			for(int j=0;j<postids.size();j++){
-				if(posts.getId(i).equals(postids.get(j))){
-					idmatches=true;
+		try{
+			if(posts.posts.get(0).getArchived().equals("1")){
+				isArchived = true;
+				System.out.println("WARNING! Thread is archived, inaccurate data regarding unique posts will be displayed.");
+			}
+		}catch (NullPointerException e){	
+		}
+		if(!isArchived){
+			for(int i=0;i<posts.posts.size();i++){
+				boolean idmatches=false;
+				for(int j=0;j<postids.size();j++){
+					if(posts.getId(i).equals(postids.get(j))){
+						idmatches=true;
+					}
+				}
+				if(idmatches==false){
+					postids.add(posts.getId(i));
+					//check if country exists
+					boolean countryexists = false;
+					for(int j=0;j<countries.size();j++){
+						if(!countryexists){
+							if(posts.getCountry(i).equals(countries.get(j).getName()))
+							{
+								countries.get(j).addOne();
+								countryexists = true;
+							}
+						}
+					}
+					if(!countryexists){
+						countries.add(new CountryData(posts.getCountry(i)));
+					}
 				}
 			}
-			if(idmatches==false){
+		}
+		else{
+			for(int i=0;i<posts.posts.size();i++){
 				postids.add(posts.getId(i));
 				//check if country exists
 				boolean countryexists = false;
@@ -69,13 +103,11 @@ public class LeafCounter {
 			}
 		}
 		
-		//Print Data
+		//Print Data and quantify leafs
 		for(int i=0;i<countries.size();i++){
 			System.out.println(countries.get(i).getName()+" "+countries.get(i).getNum());
 		}
-		System.out.println("done");
-		
-		int leafId = 0;
+		int leafId = -1;
 		int totalPosts = 0;
 		for(int i=0;i<countries.size();i++){
 			if(countries.get(i).getName().equals("CA")){
@@ -83,14 +115,11 @@ public class LeafCounter {
 			}
 			totalPosts+=countries.get(i).getNum();
 		}
-		double leafPercentage = (double)countries.get(leafId).getNum()/(double)totalPosts;
-
-		//System.out.println(leafPercentage);
-		System.out.print("Leaf clutter in this thread is at "+(leafPercentage*100)+"%");
-		
-		
-		//TODO actually process and count the leafs, check user ID for unique leafs
-		
+		double leafPercentage = 0;
+		if(leafId!=-1){
+			leafPercentage = (double)countries.get(leafId).getNum()/(double)totalPosts;
+		}
+		System.out.print("Leaf clutter in this thread is at "+(leafPercentage*100)+"%");		
 	}
 	
 	private static String readUrl(String urlString) throws Exception {
@@ -110,6 +139,4 @@ public class LeafCounter {
 	            reader.close();
 	    }
 	}
-	
-	
 }
